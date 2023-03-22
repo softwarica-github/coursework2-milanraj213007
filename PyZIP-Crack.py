@@ -16,7 +16,7 @@ def extract_zip(zip_file, start_length, max_length, wordlist):
     
     if wordlist:
         # Detect the encoding of the wordlist file
-        with open(wordlist, 'rb') as f:
+        with open(wordlist, 'r', errors='ignore') as f:
             passwords = f.read().splitlines()
             
         # Filter the passwords list to only include passwords within the desired length range
@@ -35,7 +35,8 @@ def extract_zip(zip_file, start_length, max_length, wordlist):
         except:
             password = password
         
-        print("\rTrying password: {:<{}}".format(password[:max_length], max_length), end="", flush=True)
+        print("\rTrying password: {:<{}}".format(password[:max_length], max_length), end="", flush=True) # Overwrite line every print
+        #print("Trying password:", password) # New line every print
 
         # Attempt to extract the ZIP file with the current password
         try:
