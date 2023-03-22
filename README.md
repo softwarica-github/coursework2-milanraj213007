@@ -39,4 +39,4 @@ _Sometimes_ wordlists will contain non-valid UTF-8 characters! In order to fix t
 
 Note that the error is usually really rare and depends on which wordlist you're using. But I'm providing a fix just in case it ever does show.
 
-You may find the script [here]()
+You may find the script [here](https://github.com/Korozin/ZIP-Password-Cracker/blob/main/Wordlist-Fixer/Wordlist-Fixer.py)
