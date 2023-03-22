@@ -1,7 +1,7 @@
 # ZIP-Password-Cracker
 A simple Python script to crack ZIP Passwords using fcrackzip.  
 
-The script uses a mixed method of both dictionary and bruteforce attacking, as such it requires a wordlist file. But I will provide one in the repo.
+The script uses a mixed method of both dictionary and bruteforce attacking, as such it requires a wordlist file. You can find an extensive one [here](https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt)
 
 ### Usage
 ```cmd
