@@ -12,7 +12,7 @@ def signal_handler(sig, frame):
 
 def extract_zip(zip_file, start_length, max_length, wordlist):
     # Loop through all possible password combinations
-    charset = "abcdefghijklmnopqrstuvwxyz"
+    charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{};':<>,./?|"
     
     if wordlist:
         # Detect the encoding of the wordlist file
