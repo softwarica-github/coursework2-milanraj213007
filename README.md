@@ -1,22 +1,30 @@
 # ZIP-Password-Cracker
-A simple Python script to crack ZIP Passwords using fcrackzip.  
+A simple Python script to crack ZIP Passwords
 
-The script uses a mixed method of both dictionary and bruteforce attacking, as such it requires a wordlist file. You can find an extensive one [here](https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt)
+The script uses a mask attack which encompasses both bruteforce and dictionary attacks. While a wordlist is optional, if one is not provided it will default to the bruteforce method which can take a lot longer. You can find an extensive wordlist [here](https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt)
 
 ### Usage
 ```cmd
-usage: PyZIP-Crack.py [-h] -z ZIPFILE -l WORDLIST [-m MIN_LENGTH] [-x MAX_LENGTH]
-PyZIP-Crack.py: error: the following arguments are required: -z/--zipfile, -l/--wordlist
+usage: PyCrack-ZIP.py [-h] [-zip ZIP] [-min MIN] [-max MAX] [-wordlist WORDLIST]
+
+Extract a ZIP file using a brute-force attack.
+
+optional arguments:
+  -h, --help          show this help message and exit
+  -zip ZIP            The path to the ZIP file.
+  -min MIN            The starting length of the password to try.
+  -max MAX            The maximum length of the password to try.
+  -wordlist WORDLIST  The path to a file containing a list of possible passwords.
 ```
 
 #### Example Usage
 
 ```cmd
-python PyZIP-Crack.py -z example.zip -l rockyou.txt
+python PyZIP-Crack.py -zip Example2.zip -wordlist rockyou.txt
 ```
-if the `-m` / `x` fields are left empty they are set to a default of `1` and `8`, meaning it starts at a length of 1 character passwords, and builds its way up to 8. You can change those fileds with the `-m` and `-x` arguments like so.
+if the `-min` / `-max` fields are left empty they are set to a default of `1` and `8`, meaning it starts at a length of 1 character passwords, and builds its way up to 8. You can change those fileds with the `-min` and `-max` arguments like so.
 
 ```cmd
-python PyZIP-Crack.py -z example.zip -l rockyou.txt -m 2 -x 5
+python PyZIP-Crack.py -zip Example2.zip -min 2 -max 5 -wordlist rockyou.txt
 ```
 That would run the script with a minimum length of 2 and a maximum length of 5
