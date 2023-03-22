@@ -31,7 +31,11 @@ if the `-min` / `-max` fields are left empty they are set to a default of `1` an
 ```
 python PyZIP-Crack.py -zip Example2.zip -min 2 -max 5 -wordlist rockyou.txt
 ```
-That would run the script with a minimum length of 2 and a maximum length of 5
+or for bruteforce only
+```
+python PyZIP-Crack.py -zip Example2.zip -min 2 -max 5
+```
+Both of those commands would run the script with a minimum length of 2 and a maximum length of 5
 
 # NOTE!!!
 
