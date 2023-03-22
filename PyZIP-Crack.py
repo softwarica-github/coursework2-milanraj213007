@@ -1,53 +1,75 @@
-import argparse
-import subprocess
-import sys
+import itertools, argparse, zipfile, chardet, signal, sys, threading
 
-# Default values
-zipfile = ""
-wordlist = ""
-min_length = 1
-max_length = 8
+# Define a global variable to signal the password cracking loop to stop
+stop_event = threading.Event()
 
-# Usage function
-def usage():
-    print(f"Usage: {sys.argv[0]} [-z <zipfile>] [-l <wordlist>] [-m <min_length>] [-x <max_length>]")
-    print("    -z <zipfile>: Zip file to crack (required)")
-    print("    -l <wordlist>: Password wordlist file (required)")
-    print("    -m <min_length>: Minimum password length (default: 1)")
-    print("    -x <max_length>: Maximum password length (default: 8)")
-    sys.exit(1)
+# Define a signal handler to catch the SIGINT signal
+def signal_handler(sig, frame):
+    global stop_event
+    print('\nExited')
+    stop_event.set()
+    sys.exit()
 
-# Parse command-line arguments
-parser = argparse.ArgumentParser()
-parser.add_argument("-z", "--zipfile", required=True, help="Zip file to crack")
-parser.add_argument("-l", "--wordlist", required=True, help="Password wordlist file")
-parser.add_argument("-m", "--min_length", type=int, default=min_length, help="Minimum password length (default: 2)")
-parser.add_argument("-x", "--max_length", type=int, default=max_length, help="Maximum password length (default: 6)")
-args = parser.parse_args()
+def extract_zip(zip_file, start_length, max_length, wordlist):
+    # Loop through all possible password combinations
+    charset = "abcdefghijklmnopqrstuvwxyz"
+    
+    if wordlist:
+        # Detect the encoding of the wordlist file
+        with open(wordlist, 'rb') as f:
+            passwords = f.read().splitlines()
+            
+        # Filter the passwords list to only include passwords within the desired length range
+        passwords = [password for password in passwords if start_length <= len(password) <= max_length]
+    else:
+        # Generate all possible password combinations
+        passwords = (''.join(password) for length in range(start_length, max_length+1) for password in itertools.product(charset, repeat=length))
 
-zipfile = args.zipfile
-wordlist = args.wordlist
-min_length = args.min_length
-max_length = args.max_length
+    for password in passwords:
+        ''' Set comments according to which print method you'd like '''
+        if stop_event.is_set():
+            return None
+            
+        try:
+            password = password.decode('utf-8')
+        except:
+            password = password
+        
+        print("\rTrying password: {:<{}}".format(password[:max_length], max_length), end="", flush=True)
 
-# Check if fcrackzip is installed
-try:
-    subprocess.run(["fcrackzip", "--help"], stdout=subprocess.PIPE, check=True)
-except (subprocess.CalledProcessError, FileNotFoundError):
-    print("Error: fcrackzip is not installed. Please install it before running this script.")
-    sys.exit(1)
+        # Attempt to extract the ZIP file with the current password
+        try:
+            zip_file.extractall(pwd=password.encode())
+            return password
+        except:
+            pass
 
-# Function to handle password found event
-def password_found(password):
-    print(f"\nPASSWORD FOUND!!!!: pw == {password}")
-    sys.exit(0)
+    # If no password was found, return None
+    return None
 
-# Loop over password lengths
-for length in range(min_length, max_length+1):
-    print(f"Trying passwords of length {length}")
-    # Run fcrackzip with the current length and wordlist
-    # Redirect stderr to stdout and pipe to grep to check if password is found
-    result = subprocess.run(["fcrackzip", "-u", "-p", wordlist, "-l", str(length), zipfile], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-    if "PASSWORD FOUND" in result.stdout:
-        password = result.stdout.split()[-1]
-        password_found(password)
+if __name__ == '__main__':
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description='Extract a ZIP file using a brute-force attack.')
+    parser.add_argument('-zip', type=str, help='The path to the ZIP file.')
+    parser.add_argument('-min', type=int, default=1, help='The starting length of the password to try.')
+    parser.add_argument('-max', type=int, default=8, help='The maximum length of the password to try.')
+    parser.add_argument('-wordlist', type=str, help='The path to a file containing a list of possible passwords.')
+    args = parser.parse_args()   
+    
+    # Register the signal handler
+    signal.signal(signal.SIGINT, signal_handler)
+
+    # Open the ZIP file
+    try:
+        zip_file = zipfile.ZipFile(args.zip)
+    except Exception as e:
+        parser.print_help()
+        sys.exit()
+
+    # Extract the ZIP file using a brute-force attack
+    password = extract_zip(zip_file, args.min, args.max, args.wordlist)
+
+    if password is None:
+        print('\nPassword not found.')
+    else:
+        print('\nPassword found:', password)
