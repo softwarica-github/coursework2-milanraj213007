@@ -62,7 +62,7 @@ def extract_zip(zip_file, start_length, max_length, charset, wordlist=None):
         if stop_event.is_set():
             return None
         
-        progress = f"Trying password from wordlist: {password} (on iteration: {i} of cycle: {len(password)})"
+        progress = f"Trying password: {password} (on iteration: {i} of cycle: {len(password)})"
         print("\r" + progress, end="", flush=True)
 
         # Attempt to extract the ZIP file with the current password
